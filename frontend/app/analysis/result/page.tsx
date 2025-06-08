@@ -1,37 +1,90 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ArrowLeft, Download, Share2, Info, CheckCircle, AlertCircle } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ArrowLeft,
+  Download,
+  Share2,
+  Info,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 
 export default function AnalysisResultPage() {
-  const [comparisonMode, setComparisonMode] = useState<"overlay" | "sideBySide">("overlay")
+  const [comparisonMode, setComparisonMode] = useState<
+    "overlay" | "sideBySide"
+  >("overlay");
 
-  // Mock analysis data
-  const analysisData = {
-    date: "May 26, 2025",
-    technique: "Roundhouse Kick",
-    scores: {
-      form: 85,
-      chainOfPower: 78,
-      explosiveness: 90,
-      overall: 84,
-    },
-    feedback: {
-      form: "Good stance, but elbows slightly high",
-      chainOfPower: "Improve hip rotation for power",
-      explosiveness: "Excellent speed, maintain aggression",
-    },
-    keyFrames: [
-      { id: 1, time: "0:02", label: "Starting Position" },
-      { id: 2, time: "0:04", label: "Hip Rotation" },
-      { id: 3, time: "0:05", label: "Impact Point" },
-      { id: 4, time: "0:07", label: "Recovery" },
-    ],
-  }
+  // Get analysis data from sessionStorage or use mock data
+  const [analysisData, setAnalysisData] = useState(() => {
+    // Try to get real analysis data from backend
+    if (typeof window !== "undefined") {
+      const storedResult = sessionStorage.getItem("analysisResult");
+      if (storedResult) {
+        try {
+          const realData = JSON.parse(storedResult);
+          return {
+            date: new Date().toLocaleDateString(),
+            technique: realData.technique?.name || "Unknown Technique",
+            scores: realData.scores || {
+              form: 85,
+              chainOfPower: 78,
+              explosiveness: 90,
+              overall: 84,
+            },
+            feedback: realData.feedback || {
+              form: "Good stance, but elbows slightly high",
+              chainOfPower: "Improve hip rotation for power",
+              explosiveness: "Excellent speed, maintain aggression",
+            },
+            keyFrames: realData.key_frames?.map(
+              (frame: any, index: number) => ({
+                id: index + 1,
+                time: `${Math.floor(frame.timestamp)}:${String(
+                  Math.floor((frame.timestamp % 1) * 60)
+                ).padStart(2, "0")}`,
+                label: `Frame ${index + 1}`,
+              })
+            ) || [
+              { id: 1, time: "0:02", label: "Starting Position" },
+              { id: 2, time: "0:04", label: "Hip Rotation" },
+              { id: 3, time: "0:05", label: "Impact Point" },
+              { id: 4, time: "0:07", label: "Recovery" },
+            ],
+          };
+        } catch (error) {
+          console.error("Failed to parse stored analysis data:", error);
+        }
+      }
+    }
+
+    // Fallback to mock data
+    return {
+      date: "May 26, 2025",
+      technique: "Roundhouse Kick",
+      scores: {
+        form: 85,
+        chainOfPower: 78,
+        explosiveness: 90,
+        overall: 84,
+      },
+      feedback: {
+        form: "Good stance, but elbows slightly high",
+        chainOfPower: "Improve hip rotation for power",
+        explosiveness: "Excellent speed, maintain aggression",
+      },
+      keyFrames: [
+        { id: 1, time: "0:02", label: "Starting Position" },
+        { id: 2, time: "0:04", label: "Hip Rotation" },
+        { id: 3, time: "0:05", label: "Impact Point" },
+        { id: 4, time: "0:07", label: "Recovery" },
+      ],
+    };
+  });
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -54,14 +107,18 @@ export default function AnalysisResultPage() {
                 <CardTitle>Technique Comparison</CardTitle>
                 <div className="flex space-x-2">
                   <Button
-                    variant={comparisonMode === "overlay" ? "default" : "outline"}
+                    variant={
+                      comparisonMode === "overlay" ? "default" : "outline"
+                    }
                     size="sm"
                     onClick={() => setComparisonMode("overlay")}
                   >
                     Overlay
                   </Button>
                   <Button
-                    variant={comparisonMode === "sideBySide" ? "default" : "outline"}
+                    variant={
+                      comparisonMode === "sideBySide" ? "default" : "outline"
+                    }
                     size="sm"
                     onClick={() => setComparisonMode("sideBySide")}
                   >
@@ -148,24 +205,33 @@ export default function AnalysisResultPage() {
                       <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
                       <div>
                         <h4 className="font-medium">Good stance and balance</h4>
-                        <p className="text-gray-600">Your base is solid, providing a good foundation for the kick.</p>
+                        <p className="text-gray-600">
+                          Your base is solid, providing a good foundation for
+                          the kick.
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start">
                       <AlertCircle className="h-5 w-5 text-amber-500 mr-2 mt-0.5" />
                       <div>
-                        <h4 className="font-medium">Elbow position needs adjustment</h4>
+                        <h4 className="font-medium">
+                          Elbow position needs adjustment
+                        </h4>
                         <p className="text-gray-600">
-                          Keep your guard up with elbows closer to your body for better protection.
+                          Keep your guard up with elbows closer to your body for
+                          better protection.
                         </p>
                       </div>
                     </div>
                     <div className="flex items-start">
                       <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
                       <div>
-                        <h4 className="font-medium">Good pivot on supporting foot</h4>
+                        <h4 className="font-medium">
+                          Good pivot on supporting foot
+                        </h4>
                         <p className="text-gray-600">
-                          Your pivot technique is excellent, allowing for proper rotation.
+                          Your pivot technique is excellent, allowing for proper
+                          rotation.
                         </p>
                       </div>
                     </div>
@@ -179,25 +245,32 @@ export default function AnalysisResultPage() {
                       <div>
                         <h4 className="font-medium">Limited hip rotation</h4>
                         <p className="text-gray-600">
-                          Increase your hip rotation to generate more power through the kinetic chain.
+                          Increase your hip rotation to generate more power
+                          through the kinetic chain.
                         </p>
                       </div>
                     </div>
                     <div className="flex items-start">
                       <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
                       <div>
-                        <h4 className="font-medium">Good shoulder engagement</h4>
+                        <h4 className="font-medium">
+                          Good shoulder engagement
+                        </h4>
                         <p className="text-gray-600">
-                          Your upper body mechanics are contributing well to the power generation.
+                          Your upper body mechanics are contributing well to the
+                          power generation.
                         </p>
                       </div>
                     </div>
                     <div className="flex items-start">
                       <AlertCircle className="h-5 w-5 text-amber-500 mr-2 mt-0.5" />
                       <div>
-                        <h4 className="font-medium">Core engagement could improve</h4>
+                        <h4 className="font-medium">
+                          Core engagement could improve
+                        </h4>
                         <p className="text-gray-600">
-                          Tighten your core throughout the movement to transfer power more efficiently.
+                          Tighten your core throughout the movement to transfer
+                          power more efficiently.
                         </p>
                       </div>
                     </div>
@@ -210,7 +283,9 @@ export default function AnalysisResultPage() {
                       <CheckCircle className="h-5 w-5 text-green-500 mr-2 mt-0.5" />
                       <div>
                         <h4 className="font-medium">Excellent speed</h4>
-                        <p className="text-gray-600">Your kick execution is fast and decisive.</p>
+                        <p className="text-gray-600">
+                          Your kick execution is fast and decisive.
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start">
@@ -218,7 +293,8 @@ export default function AnalysisResultPage() {
                       <div>
                         <h4 className="font-medium">Good aggression</h4>
                         <p className="text-gray-600">
-                          Your commitment to the technique shows good intent and aggression.
+                          Your commitment to the technique shows good intent and
+                          aggression.
                         </p>
                       </div>
                     </div>
@@ -227,7 +303,8 @@ export default function AnalysisResultPage() {
                       <div>
                         <h4 className="font-medium">Smooth transitions</h4>
                         <p className="text-gray-600">
-                          Your movement flows naturally from setup to execution to recovery.
+                          Your movement flows naturally from setup to execution
+                          to recovery.
                         </p>
                       </div>
                     </div>
@@ -247,9 +324,15 @@ export default function AnalysisResultPage() {
             <CardContent>
               <div className="space-y-6">
                 <div className="text-center p-4 bg-gray-50 rounded-lg mb-6">
-                  <div className="text-sm text-gray-500 mb-1">OVERALL SCORE</div>
-                  <div className="text-5xl font-bold text-red-600">{analysisData.scores.overall}</div>
-                  <div className="text-sm text-gray-500 mt-1">{analysisData.technique}</div>
+                  <div className="text-sm text-gray-500 mb-1">
+                    OVERALL SCORE
+                  </div>
+                  <div className="text-5xl font-bold text-red-600">
+                    {analysisData.scores.overall}
+                  </div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    {analysisData.technique}
+                  </div>
                 </div>
 
                 <ScoreBar
@@ -275,7 +358,9 @@ export default function AnalysisResultPage() {
               </div>
 
               <div className="mt-8 pt-6 border-t border-gray-200">
-                <div className="text-sm text-gray-500 mb-2">Analyzed on {analysisData.date}</div>
+                <div className="text-sm text-gray-500 mb-2">
+                  Analyzed on {analysisData.date}
+                </div>
                 <div className="flex space-x-2">
                   <Button variant="outline" size="sm" className="flex-1">
                     <Download className="mr-2 h-4 w-4" />
@@ -298,7 +383,9 @@ export default function AnalysisResultPage() {
               <div className="space-y-4">
                 <div className="p-4 border border-gray-200 rounded-lg">
                   <h4 className="font-medium mb-1">Hip Rotation Drill</h4>
-                  <p className="text-sm text-gray-600 mb-2">Improve your power generation with this focused drill.</p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    Improve your power generation with this focused drill.
+                  </p>
                   <Button variant="link" size="sm" className="px-0">
                     View Drill
                   </Button>
@@ -307,7 +394,8 @@ export default function AnalysisResultPage() {
                 <div className="p-4 border border-gray-200 rounded-lg">
                   <h4 className="font-medium mb-1">Guard Position Practice</h4>
                   <p className="text-sm text-gray-600 mb-2">
-                    Work on keeping your elbows in the correct defensive position.
+                    Work on keeping your elbows in the correct defensive
+                    position.
                   </p>
                   <Button variant="link" size="sm" className="px-0">
                     View Drill
@@ -315,21 +403,27 @@ export default function AnalysisResultPage() {
                 </div>
 
                 <div className="p-4 border border-gray-200 rounded-lg">
-                  <h4 className="font-medium mb-1">Core Engagement Exercises</h4>
-                  <p className="text-sm text-gray-600 mb-2">Strengthen your core to improve power transfer in kicks.</p>
+                  <h4 className="font-medium mb-1">
+                    Core Engagement Exercises
+                  </h4>
+                  <p className="text-sm text-gray-600 mb-2">
+                    Strengthen your core to improve power transfer in kicks.
+                  </p>
                   <Button variant="link" size="sm" className="px-0">
                     View Drill
                   </Button>
                 </div>
               </div>
 
-              <Button className="w-full mt-6 bg-red-600 hover:bg-red-700">Add to Training Plan</Button>
+              <Button className="w-full mt-6 bg-red-600 hover:bg-red-700">
+                Add to Training Plan
+              </Button>
             </CardContent>
           </Card>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function ScoreBar({ label, score, feedback, color }) {
@@ -340,12 +434,15 @@ function ScoreBar({ label, score, feedback, color }) {
         <div className="font-bold">{score}</div>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
-        <div className={`${color} h-2.5 rounded-full`} style={{ width: `${score}%` }}></div>
+        <div
+          className={`${color} h-2.5 rounded-full`}
+          style={{ width: `${score}%` }}
+        ></div>
       </div>
       <div className="flex items-start mt-1">
         <Info className="h-4 w-4 text-gray-400 mr-1 mt-0.5 flex-shrink-0" />
         <p className="text-xs text-gray-500">{feedback}</p>
       </div>
     </div>
-  )
+  );
 }

@@ -1,29 +1,29 @@
 """
-真实的参考姿势数据需要从专业运动员身上测量获得
+Real reference pose data that needs to be measured from professional athletes
 """
 import numpy as np
 
-# 这些数据需要从真实的专业泰拳运动员视频中提取
+# This data needs to be extracted from real professional Muay Thai athlete videos
 class RealReferencePoses:
     def __init__(self):
-        # 注意：这些数值需要从实际数据中统计得出
+        # Note: These values need to be statistically derived from actual data
         self.professional_standards = {
             "jab": {
                 "optimal_angles": {
-                    # 从100个专业拳手的jab视频中统计得出的平均值和标准差
+                    # Mean and standard deviation derived from 100 professional boxer jab videos
                     "lead_arm_extension": {"mean": 165, "std": 8, "range": [155, 175]},
                     "rear_guard_elbow": {"mean": 90, "std": 5, "range": [85, 95]},
                     "hip_rotation": {"mean": 12, "std": 3, "range": [8, 18]},
                     "stance_width": {"mean": 0.32, "std": 0.04, "range": [0.25, 0.4]}
                 },
                 "timing_patterns": {
-                    # 从视频分析得出的时间模式
-                    "setup_duration": {"mean": 0.15, "std": 0.03},  # 秒
+                    # Time patterns derived from video analysis
+                    "setup_duration": {"mean": 0.15, "std": 0.03},  # seconds
                     "execution_duration": {"mean": 0.08, "std": 0.02},
                     "recovery_duration": {"mean": 0.12, "std": 0.03}
                 },
                 "power_metrics": {
-                    # 从力量分析得出的指标
+                    # Metrics derived from power analysis
                     "peak_velocity": {"mean": 8.5, "std": 1.2},  # m/s
                     "acceleration": {"mean": 45, "std": 8}  # m/s²
                 }
@@ -50,48 +50,48 @@ class RealReferencePoses:
         }
     
     def get_technique_standards(self, technique_name):
-        """获取特定技术的专业标准"""
+        """Get professional standards for specific technique"""
         return self.professional_standards.get(technique_name, {})
     
     def calculate_deviation_score(self, user_measurement, professional_standard):
-        """计算用户动作与专业标准的偏差分数"""
+        """Calculate deviation score between user movement and professional standard"""
         mean = professional_standard["mean"]
         std = professional_standard["std"]
         
-        # 计算标准化偏差
+        # Calculate standardized deviation
         z_score = abs(user_measurement - mean) / std
         
-        # 转换为0-100分数（越接近专业标准分数越高）
-        if z_score <= 1:  # 在1个标准差内
-            score = 100 - (z_score * 15)  # 85-100分
-        elif z_score <= 2:  # 在2个标准差内
-            score = 85 - ((z_score - 1) * 25)  # 60-85分
-        else:  # 超过2个标准差
-            score = max(0, 60 - ((z_score - 2) * 20))  # 0-60分
+        # Convert to 0-100 score (closer to professional standard = higher score)
+        if z_score <= 1:  # Within 1 standard deviation
+            score = 100 - (z_score * 15)  # 85-100 points
+        elif z_score <= 2:  # Within 2 standard deviations
+            score = 85 - ((z_score - 1) * 25)  # 60-85 points
+        else:  # Beyond 2 standard deviations
+            score = max(0, 60 - ((z_score - 2) * 20))  # 0-60 points
         
         return round(score)
 
-# 示例：如何使用真实数据
+# Example: How to use real data
 reference_poses = RealReferencePoses()
 
-# 模拟用户的jab动作测量值
+# Simulate user's jab movement measurements
 user_jab_data = {
-    "lead_arm_extension": 158,  # 用户的手臂伸展角度
-    "hip_rotation": 10,         # 用户的髋部旋转角度
-    "stance_width": 0.35        # 用户的站姿宽度
+    "lead_arm_extension": 158,  # User's arm extension angle
+    "hip_rotation": 10,         # User's hip rotation angle
+    "stance_width": 0.35        # User's stance width
 }
 
-# 获取专业标准
+# Get professional standards
 jab_standards = reference_poses.get_technique_standards("jab")
 
-print("=== 真实参考数据示例 ===")
-print("专业Jab标准:")
+print("=== Real Reference Data Example ===")
+print("Professional Jab Standards:")
 for metric, values in jab_standards["optimal_angles"].items():
-    print(f"  {metric}: 平均值={values['mean']}, 标准差={values['std']}")
+    print(f"  {metric}: mean={values['mean']}, std={values['std']}")
 
-print("\n用户评分:")
+print("\nUser Scoring:")
 for metric, user_value in user_jab_data.items():
     if metric in jab_standards["optimal_angles"]:
         standard = jab_standards["optimal_angles"][metric]
         score = reference_poses.calculate_deviation_score(user_value, standard)
-        print(f"  {metric}: 用户值={user_value}, 分数={score}/100")
+        print(f"  {metric}: user_value={user_value}, score={score}/100")

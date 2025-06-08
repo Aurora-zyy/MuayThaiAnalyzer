@@ -1,8 +1,8 @@
 """
-真实实现需要收集的数据类型和数量
+Data types and quantities needed for real implementation
 """
 
-# 1. 专业泰拳视频数据集
+# 1. Professional Muay Thai video dataset
 professional_video_requirements = {
     "techniques": {
         "jab": {"videos": 500, "angles": ["front", "side", "45_degree"]},
@@ -24,7 +24,7 @@ professional_video_requirements = {
     }
 }
 
-# 2. 专家评分数据
+# 2. Expert scoring data
 expert_scoring_data = {
     "evaluators": {
         "count": 10,
@@ -51,7 +51,7 @@ expert_scoring_data = {
     "inter_rater_reliability": "Target: >0.8 correlation"
 }
 
-# 3. 用户练习数据
+# 3. User practice data
 user_practice_data = {
     "beta_users": 200,
     "videos_per_user": 20,
@@ -64,8 +64,8 @@ user_practice_data = {
     "data_collection_period": "6 months"
 }
 
-print("=== 真实数据收集需求 ===")
-print(f"专业视频: {professional_video_requirements['total_videos']} 个")
-print(f"专家评分员: {expert_scoring_data['evaluators']['count']} 人")
-print(f"用户测试视频: {user_practice_data['total_user_videos']} 个")
-print(f"总数据量估计: ~50GB 视频数据")
+print("=== Real Data Collection Requirements ===")
+print(f"Professional videos: {professional_video_requirements['total_videos']} videos")
+print(f"Expert evaluators: {expert_scoring_data['evaluators']['count']} people")
+print(f"User test videos: {user_practice_data['total_user_videos']} videos")
+print(f"Total data estimate: ~50GB video data")
